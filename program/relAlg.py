@@ -26,8 +26,7 @@ def _get_cols(rel):
 def _write_relation_page(rel, page):
     with open(os.path.join(data_path, "pagePool.txt"), "r") as f:
         page_pool = json.load(f)
-        page_name = page_pool[0]
-        page_pool = page_pool[1:]
+        page_name = page_pool.pop()
 
     with open(os.path.join(data_path, "pagePool.txt"), "w") as f:
         json.dump(page_pool, f)
@@ -163,5 +162,3 @@ def join(rel1, att1, rel2, att2):
         i = i + 1
 
     return _write_result(columns, results)
-
-join("Suppliers", "sid", "Supply", "sid")
