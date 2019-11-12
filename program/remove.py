@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 
 base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -40,5 +41,20 @@ def removeTree(rel, att):
 
 
 def removeTable(rel):
-    pass
+    schema_path = os.path.join(data_path, "schemas.txt")
+
+    schema = json.load(open(schema_path, "r"))
+    schema = [s for s in schema if s[0] != rel]
+    json.dump(schema, open(schema_path, "w"))
+
+    page_pool_path = os.path.join(data_path, "pagePool.txt")
+    page_pool = json.load(open(page_pool_path))
+
+    rel_path = os.path.join(data_path, rel)
+    for page in json.load(open(os.path.join(rel_path, "pageLink.txt"), "r")):
+        page_pool.append(page)
+
+    json.dump(page_pool, open(page_pool_path, "w"))
+
+    shutil.rmtree(rel_path)
 
