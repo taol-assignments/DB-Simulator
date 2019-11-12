@@ -4,6 +4,14 @@ import binascii
 
 base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 data_path = os.path.join(base_path, "data")
+index_path = os.path.join(base_path, "index")
+op_lambdas = {
+    "<": lambda a, b: a < b,
+    "<=": lambda a, b: a <= b,
+    "=": lambda a, b: a == b,
+    ">": lambda a, b: a > b,
+    ">=": lambda a, b: a >= b,
+}
 
 
 def _read_schemas():
@@ -73,11 +81,80 @@ def _write_result(cols, rows):
 def _scan_table(callback, rel):
     rel_path = os.path.join(data_path, rel)
     page_link = json.load(open(os.path.join(rel_path, "pageLink.txt"), "r"))
+    cost = 0
 
     for page_name in page_link:
         page = json.load(open(os.path.join(rel_path, page_name), "r"))
+        cost += 1
         for row in page:
             callback(row)
+    return cost
+
+
+def _scan_b_tree(root, op, val):
+    cost = 0
+    content = json.load(open(os.path.join(index_path, root), "r"))
+    cost += 1
+    if content[0] != 'L':
+        compare_list = content[2]
+        index = -1
+        for idx, value in enumerate(compare_list):
+            if idx % 2 != 0 and val < value:
+                index = idx
+                break
+        if index == -1:
+            index = len(compare_list)
+        new_root = compare_list[index - 1]
+        new_scan_result = _scan_b_tree(new_root, op, val)
+        cost += new_scan_result[0]
+        return [cost, new_scan_result[1]]
+    else:
+        data_sets = content[4]
+        result_list = []
+        for idx, value in enumerate(data_sets):
+            if idx % 2 == 0 and op_lambdas[op](value, val):
+                result_list += data_sets[idx + 1]
+        if '<' in op:
+            new_result = _scan_all_leaf_nodes_from('L', content[2])
+            result_list += new_result[1]
+            cost += new_result[0]
+        elif '>' in op:
+            new_result = _scan_all_leaf_nodes_from('R', content[3])
+            result_list += new_result[1]
+            cost += new_result[0]
+        return [cost, result_list]
+
+
+def _get_tuples(rel, rid_list):
+    result = []
+    rel_path = os.path.join(data_path, rel)
+    for row in rid_list:
+        offset = int(row[-1:])
+        page_name = row[:-1]
+        content = json.load(open(os.path.join(rel_path, page_name), "r"))
+        result.append(content[offset])
+    return result
+
+
+def _scan_all_leaf_nodes_from(direction, start_page):
+    result = []
+    cost = 0
+    if start_page == 'nil':
+        return [cost, result]
+    content = json.load(open(os.path.join(index_path, start_page), "r"))
+    cost += 1
+    data_sets = content[4]
+    for idx, value in enumerate(data_sets):
+        if idx % 2 != 0:
+            result += value
+    if direction == 'L':
+        new_start_page = content[2]
+    else:
+        new_start_page = content[3]
+    new_result = _scan_all_leaf_nodes_from(direction, new_start_page)
+    cost += new_result[0]
+    result += new_result[1]
+    return [cost, result]
 
 
 def select(rel, att, op, val):
@@ -85,31 +162,32 @@ def select(rel, att, op, val):
 
     search_column = [col for col in columns if col["name"] == att][0]
 
-    op_lambdas = {
-        "<": lambda a, b: a < b,
-        "<=": lambda a, b: a <= b,
-        "=": lambda a, b: a == b,
-        ">": lambda a, b: a > b,
-        ">=": lambda a, b: a >= b,
-    }
-
     index = None
-    index_path = os.path.join(base_path, "index")
     for root in json.load(open(os.path.join(index_path, "directory.txt"), "r")):
         if root[0] == rel and root[1] == att:
-            index = json.load(open(os.path.join(index_path, root[2]), "r"))
+            # index = json.load(open(os.path.join(index_path, root[2]), "r"))
+            index = root[2]
             break
 
     results = []
 
-    if index:
-        pass
+    if index is not None:
+        tree_result = _scan_b_tree(index, op, val)
+        cost = tree_result[0]
+        result_tuples = _get_tuples(rel, tree_result[1])
+        results += result_tuples
+        cost += len(tree_result[1])
+        output_str = 'With B+_tree, the cost of searching '\
+                     + att + ' ' + op + ' ' + str(val) + 'on' + rel + ' is ' + str(cost) + ' pages'
     else:
         def _scan_callback(row):
             if op_lambdas[op](row[search_column["index"]], val):
                 results.append(row)
 
-        _scan_table(_scan_callback, rel)
+        cost = _scan_table(_scan_callback, rel)
+        output_str = 'Without B+_tree, the cost of searching '\
+                     + att + ' ' + op + ' ' + str(val) + 'on' + rel + ' is ' + str(cost) + ' pages'
+    print(output_str)
 
     return _write_result(columns, results)
 
