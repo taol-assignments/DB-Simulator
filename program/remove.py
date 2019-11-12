@@ -5,6 +5,7 @@ import shutil
 
 base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 data_path = os.path.join(base_path, "data")
+tree_pic_path = os.path.join(base_path, "treePic")
 index_path = os.path.join(base_path, "index")
 
 
@@ -21,6 +22,8 @@ def _do_remove_tree(page_name, page_list):
 
 
 def removeTree(rel, att):
+    tree_pic_file_path = os.path.join(tree_pic_path, rel + "_" + att + ".txt")
+    os.unlink(tree_pic_file_path)
     directory_path = os.path.join(index_path, "directory.txt")
 
     page_list = []
