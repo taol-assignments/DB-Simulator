@@ -24,15 +24,22 @@ def _get_cols(rel):
 
 
 def _write_relation_page(rel, page):
-    with open(os.path.join(data_path, "pagePool.txt"), "r") as f:
-        page_pool = json.load(f)
-        page_name = page_pool.pop()
+    page_pool_path = os.path.join(data_path, "pagePool.txt")
+    page_pool = json.load(open(page_pool_path, "r"))
 
-    with open(os.path.join(data_path, "pagePool.txt"), "w") as f:
-        json.dump(page_pool, f)
+    page_name = page_pool.pop()
 
-        with open(os.path.join(data_path, rel, page_name), "w") as page_file:
-            json.dump(page, page_file)
+    json.dump(page_pool, open(page_pool_path, "w"))
+
+    rel_path = os.path.join(data_path, rel)
+
+    json.dump(page, open(os.path.join(rel_path, page_name), "w"))
+
+    page_link_path = os.path.join(rel_path, 'pageLink.txt')
+    if os.path.exists(page_link_path):
+        json.dump(json.load(open(page_link_path, "r")) + [page_name], open(page_link_path, "w"))
+    else:
+        json.dump([page_name], open(page_link_path, "w"))
 
 
 def _write_result(cols, rows):
