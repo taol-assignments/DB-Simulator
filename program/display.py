@@ -45,13 +45,46 @@ def displayTree(fname):
 
 
 def displayTable(rel, fname):
+    _append_to_page(query_output_path, fname, rel + '\r\n')
+
+    cols = [row for row in _get_content(data_path, 'schemas.txt') if row[0] == rel]
+    cols.sort(key=lambda r: r[3])
+
     rel_path = os.path.join(data_path, rel)
-    schemas_content = _get_content(data_path, 'schemas.txt')
-    _append_to_page(query_output_path, 'queryResult.txt', rel + '\r\n')
-    attr_for_rel = []
-    for row in schemas_content:
-        if rel in row:
-            attr_for_rel.insert(row[3], row[1])
 
-    pass
+    rows = []
+    for page_name in _get_content(rel_path, 'pageLink.txt'):
+        rows += _get_content(rel_path, page_name)
 
+    max_len = [len(col[1]) for col in cols]
+
+    for row in rows:
+        for i, s in enumerate(row):
+            max_len[i] = max(max_len[i], len(str(s)))
+
+    separator = '+'
+    for l in max_len:
+        separator += '-' * (l + 2) + '+'
+
+    separator += '\r\n'
+
+    def _generate_row(row):
+        output = '|'
+
+        for i, elem in enumerate(row):
+            s = str(elem)
+            if len(s) < max_len[i]:
+                s += ' ' * (max_len[i] - len(s))
+
+            output += ' ' + s + ' |'
+
+        return output + '\r\n'
+
+    result = separator + _generate_row([col[1] for col in cols]) + separator
+
+    for row in rows:
+        result += _generate_row(row)
+
+    result += separator
+
+    _append_to_page(query_output_path, fname, result)
