@@ -196,5 +196,8 @@ def build(rel, att, od):
             data_set.append(data_rids)
             # insert search key into B+ tree
             root = _insert_key(root, data_set, max_element)
-
+    directory_content = _get_content('directory.txt')
+    b_tree_schema = [rel, att, root]
+    directory_content.append(b_tree_schema)
+    _write_to_page('directory.txt', directory_content)
     return root
