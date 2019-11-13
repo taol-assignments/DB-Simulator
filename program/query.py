@@ -5,14 +5,17 @@ from display import displayTable
 from remove import removeTree
 from remove import removeTable
 from relAlg import select
+from relAlg import join
 
-
-''' root = build('Suppliers', 'sid', 2)
+root = build('Suppliers', 'sid', 2)
 page_name = displayTree(root)
 print(root + ":" + page_name)
 root = build('Supply', 'pid', 2)
 page_name = displayTree(root)
-print(root + ":" + page_name)'''
+print(root + ":" + page_name)
 
 # print(select('Supply', 'sid', '>', "s18"))
-removeTable('Temp_ca2a8a303204f9f50a5886601792f0')
+print(join('Supply', 'pid', 'Products', 'pid'))
+# removeTable('Temp_19c11df38f6e6a95dec8d743bb3efa')
+# removeTree('Suppliers', 'sid')
+

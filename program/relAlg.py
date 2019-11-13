@@ -186,7 +186,7 @@ def select(rel, att, op, val):
 
         cost = _scan_table(_scan_callback, rel)
         output_str = 'Without B+_tree, the cost of searching '\
-                     + att + ' ' + op + ' ' + str(val) + 'on' + rel + ' is ' + str(cost) + ' pages'
+                     + att + ' ' + op + ' ' + str(val) + ' on ' + rel + ' is ' + str(cost) + ' pages'
     print(output_str)
 
     return _write_result(columns, results)
@@ -227,23 +227,74 @@ def join(rel1, att1, rel2, att2):
 
     results = []
 
-    pl1 = json.load(open(os.path.join(data_path, rel1, "pageLink.txt"), "r"))
-    pl2 = json.load(open(os.path.join(data_path, rel2, "pageLink.txt"), "r"))
+    rel_with_b_tree = None
+    rel_root = None
+    external_rel = None
+    index_external = None
+    index_internal = None
+    column_external = None
+    column_internal = None
+    for root in json.load(open(os.path.join(index_path, "directory.txt"), "r")):
+        if root[0] == rel1 and root[1] == att1:
+            # index = json.load(open(os.path.join(index_path, root[2]), "r"))
+            rel_with_b_tree = rel1
+            rel_root = root[2]
+            external_rel = rel2
+            index_external = i2
+            index_internal = i1
+            column_external = c2
+            column_internal = c1
+            break
+        if root[0] == rel2 and root[1] == att2:
+            rel_with_b_tree = rel2
+            rel_root = root[2]
+            external_rel = rel1
+            index_external = i1
+            index_internal = i2
+            column_external = c1
+            column_internal = c2
+            break
 
-    for pname1 in pl1:
-        p1 = json.load(open(os.path.join(data_path, rel1, pname1), "r"))
-        for pname2 in pl2:
-            p2 = json.load(open(os.path.join(data_path, rel2, pname2), "r"))
-            for r1 in p1:
-                for r2 in p2:
-                    if r1[i1] == r2[i2]:
-                        results.append(r1 + r2[:i2] + r2[i2 + 1:])
+    if rel_with_b_tree is not None:
+        cost = 0
+        external_page_names = json.load(open(os.path.join(data_path, external_rel, "pageLink.txt"), "r"))
+        for page_name in external_page_names:
+            external_page_content = json.load(open(os.path.join(data_path, external_rel, page_name), "r"))
+            cost += 1
+            for tuple in external_page_content:
+                key = tuple[index_external]
+                scan_result = _scan_b_tree(rel_root, '=', key)
+                cost += scan_result[0]
+                equivalent_internal_tuples = _get_tuples(rel_with_b_tree, scan_result[1])
+                cost += len(scan_result[1])
+                for equivalent_tuple in equivalent_internal_tuples:
+                    results.append(tuple + equivalent_tuple[:index_internal] + equivalent_tuple[index_internal + 1:])
+        output_str = 'With B+_tree, the cost of joining '\
+                     + rel1 + ', ' + rel2 + ' on ' + att1 + ', ' + att2 + ' is ' + str(cost) + ' pages'
+        print(output_str)
+        columns = column_external + column_internal[:index_internal] + column_internal[index_internal + 1:]
 
-    columns = c1 + c2[:i2] + c2[i2 + 1:]
+        i = 0
+        for col in columns:
+            col["index"] = i
+            i = i + 1
+    else:
+        pl1 = json.load(open(os.path.join(data_path, rel1, "pageLink.txt"), "r"))
+        pl2 = json.load(open(os.path.join(data_path, rel2, "pageLink.txt"), "r"))
 
-    i = 0
-    for col in columns:
-        col["index"] = i
-        i = i + 1
+        for pname1 in pl1:
+            p1 = json.load(open(os.path.join(data_path, rel1, pname1), "r"))
+            for pname2 in pl2:
+                p2 = json.load(open(os.path.join(data_path, rel2, pname2), "r"))
+                for r1 in p1:
+                    for r2 in p2:
+                        if r1[i1] == r2[i2]:
+                            results.append(r1 + r2[:i2] + r2[i2 + 1:])
 
+        columns = c1 + c2[:i2] + c2[i2 + 1:]
+
+        i = 0
+        for col in columns:
+            col["index"] = i
+            i = i + 1
     return _write_result(columns, results)
