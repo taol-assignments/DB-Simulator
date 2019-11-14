@@ -178,7 +178,7 @@ def select(rel, att, op, val):
         results += result_tuples
         cost += len(tree_result[1])
         output_str = 'With B+_tree, the cost of searching '\
-                     + att + ' ' + op + ' ' + str(val) + 'on' + rel + ' is ' + str(cost) + ' pages'
+                     + att + ' ' + op + ' ' + str(val) + ' on ' + rel + ' is ' + str(cost) + ' pages'
     else:
         def _scan_callback(row):
             if op_lambdas[op](row[search_column["index"]], val):
@@ -192,28 +192,28 @@ def select(rel, att, op, val):
     return _write_result(columns, results)
 
 
-def project(rel, *attr_list):
-    attr_list = list(attr_list)
-
+def project(rel, attr_list):
     columns = [col for col in _get_cols(rel) if col["name"] in attr_list]
 
-    i = 0
+    col2index = {}
     for col in columns:
-        col["index"] = i
-        i += 1
+        col2index[col["name"]] = col["index"]
 
     results = []
 
     def _scan_callback(row):
         result = []
-        for col in columns:
-            result.append(row[col["index"]])
+        for col in attr_list:
+            result.append(row[col2index[col]])
 
         result = tuple(result)
         if result not in results:
             results.append(result)
 
     _scan_table(_scan_callback, rel)
+
+    for col in columns:
+        col["index"] = attr_list.index(col["name"])
 
     return _write_result(columns, results)
 

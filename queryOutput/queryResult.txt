@@ -1,0 +1,60 @@
+a. Find the name for the supplier 's23' when a B+_tree exists on Suppliers.sid.
+Result Table
++-------+
+| sname |
++-------+
+| Walsh |
++-------+
+b. Remove the B+_tree from Suppliers.sid, and repeat Question a.
+Result Table
++-------+
+| sname |
++-------+
+| Walsh |
++-------+
+c. Find the address of the suppliers who supplied 'p15'.
+Result Table
++-----------------+
+| address         |
++-----------------+
+| 12 Water Street |
+| 20 Scott Street |
+| 100 Main Road   |
+| 70 Forest Road  |
++-----------------+
+d. What is the cost of 'p20' supplied by 'Kiddie'?
+Result Table
++-------+
+| cost  |
++-------+
+| 28.82 |
++-------+
+e. For each supplier who supplied products with a cost of 47 or higher, list his/her name, product name and the cost.
+Result Table
++--------+-----------------+-------+
+| sname  | pname           | cost  |
++--------+-----------------+-------+
+| Brown  | shovel          | 48.78 |
+| Brown  | grill           | 49.85 |
+| Wang   | siding          | 49.39 |
+| Carew  | paint           | 48.57 |
+| Carew  | air conditioner | 49.55 |
+| Carter | vacuum          | 47.3  |
+| Evoy   | matherboard     | 49.26 |
+| Evans  | switch          | 47.3  |
+| Lee    | fan             | 47.81 |
+| Carter | screwdriver     | 47.27 |
+| kielly | kettle          | 48.01 |
+| Zhang  | flashlight      | 49.45 |
+| Edward | matherboard     | 49.01 |
+| Edward | monitor         | 47.62 |
+| Newwll | air conditioner | 49.66 |
+| Hayley | usb             | 47.42 |
+| Hayley | flashlight      | 49.62 |
+| Hayley | switch          | 48.76 |
+| Kiddie | usb             | 47.12 |
+| Kiddie | sander          | 47.69 |
+| Kieley | matherboard     | 47.03 |
+| Kieley | chair           | 48.15 |
+| Walsh  | sofa            | 48.82 |
++--------+-----------------+-------+

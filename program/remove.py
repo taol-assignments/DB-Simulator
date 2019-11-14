@@ -22,8 +22,9 @@ def _do_remove_tree(page_name, page_list):
 
 
 def removeTree(rel, att):
-    tree_pic_file_path = os.path.join(tree_pic_path, rel + "_" + att + ".txt")
-    os.unlink(tree_pic_file_path)
+    # tree_pic_file_path = os.path.join(tree_pic_path, rel + "_" + att + ".txt")
+    # if os.path.exists(tree_pic_file_path):
+        #os.unlink(tree_pic_file_path)
     directory_path = os.path.join(index_path, "directory.txt")
 
     page_list = []

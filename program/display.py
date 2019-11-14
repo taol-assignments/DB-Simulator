@@ -45,7 +45,7 @@ def displayTree(fname):
 
 
 def displayTable(rel, fname):
-    _append_to_page(query_output_path, fname, rel + '\r\n')
+    _append_to_page(query_output_path, fname, 'Result Table' + '\r\n')
 
     cols = [row for row in _get_content(data_path, 'schemas.txt') if row[0] == rel]
     cols.sort(key=lambda r: r[3])
