@@ -269,9 +269,9 @@ def join(rel1, att1, rel2, att2):
                 cost += len(scan_result[1])
                 for equivalent_tuple in equivalent_internal_tuples:
                     results.append(tuple + equivalent_tuple[:index_internal] + equivalent_tuple[index_internal + 1:])
-        output_str = 'With B+_tree, the cost of joining '\
-                     + rel1 + ', ' + rel2 + ' on ' + att1 + ', ' + att2 + ' is ' + str(cost) + ' pages'
-        print(output_str)
+        # output_str = 'With B+_tree, the cost of joining '\
+        #             + rel1 + ', ' + rel2 + ' on ' + att1 + ', ' + att2 + ' is ' + str(cost) + ' pages'
+        # print(output_str)
         columns = column_external + column_internal[:index_internal] + column_internal[index_internal + 1:]
 
         i = 0

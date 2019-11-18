@@ -24,7 +24,7 @@ def read_tree(display_file_name, fname, table_num):
     table_space = ""
     for x in range(0, table_num):
         table_space += "  "
-    _append_to_page(tree_pic_path, display_file_name, table_space + fname + ":" + json.dumps(content) + '\r\n')
+    _append_to_page(tree_pic_path, display_file_name, table_space + fname + ":" + json.dumps(content) + '\n')
     if content[0] != 'L':
         data_sets = content[2]
         for idx, value in enumerate(data_sets):
@@ -45,7 +45,7 @@ def displayTree(fname):
 
 
 def displayTable(rel, fname):
-    _append_to_page(query_output_path, fname, 'Result Table' + '\r\n')
+    _append_to_page(query_output_path, fname, 'Result Table' + '\n')
 
     cols = [row for row in _get_content(data_path, 'schemas.txt') if row[0] == rel]
     cols.sort(key=lambda r: r[3])
@@ -66,7 +66,7 @@ def displayTable(rel, fname):
     for l in max_len:
         separator += '-' * (l + 2) + '+'
 
-    separator += '\r\n'
+    separator += '\n'
 
     def _generate_row(row):
         output = '|'
@@ -78,7 +78,7 @@ def displayTable(rel, fname):
 
             output += ' ' + s + ' |'
 
-        return output + '\r\n'
+        return output + '\n'
 
     result = separator + _generate_row([col[1] for col in cols]) + separator
 
