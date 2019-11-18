@@ -11,11 +11,12 @@ query_output_path = os.path.join(base_path, "queryOutput")
 query_result_page = 'queryResult.txt'
 
 
+# build B+ Tree on Suppliers.sid and Supply.pid, then display them under treePic
+displayTree(build('Suppliers', 'sid', 2))
+displayTree(build('Supply', 'pid', 2))
+
+
 # a. Find the name for the supplier ‘s23’ when a B+_tree exists on Suppliers.sid.
-# build a B+ tree on Suppliers.sid
-root_of_tree_on_suppliers = build('Suppliers', 'sid', 2)
-# display the tree under folder treePic with name: Suppliers_sid.txt
-tree_pic_of_suppliers = displayTree(root_of_tree_on_suppliers)
 # Find the name for the supplier ‘s23’ using the B+_tree
 temp_relation_after_selection = select('Suppliers', 'sid', '=', 's23')
 result_relation_after_projection = project(temp_relation_after_selection, ['sname'])
@@ -44,11 +45,6 @@ open(os.path.join(query_output_path, query_result_page), "a").write(
 displayTable(result_relation_after_projection, query_result_page)
 # remove the result relation table
 removeTable(result_relation_after_projection)
-
-
-# build B+ Tree on Suppliers.sid and Supply.pid, then display them under treePic
-displayTree(build('Suppliers', 'sid', 2))
-displayTree(build('Supply', 'pid', 2))
 
 
 # c. Find the address of the suppliers who supplied 'p15'.
