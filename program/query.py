@@ -1,5 +1,5 @@
 #!C:\Users\LSS\AppData\Local\Programs\Python\Python37\python.exe
-from buildTree import build
+
 from display import displayTree, displayTable
 from remove import removeTree, removeTable
 from relAlg import select, project, join
@@ -9,11 +9,6 @@ import os
 base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 query_output_path = os.path.join(base_path, "queryOutput")
 query_result_page = 'queryResult.txt'
-
-
-# build B+ Tree on Suppliers.sid and Supply.pid, then display them under treePic
-displayTree(build('Suppliers', 'sid', 2))
-displayTree(build('Supply', 'pid', 2))
 
 
 # a. Find the name for the supplier ‘s23’ when a B+_tree exists on Suppliers.sid.
@@ -99,4 +94,3 @@ open(os.path.join(query_output_path, query_result_page), "a").write(
     "e. For each supplier who supplied products with a cost of 47 or higher, list his/her name, product name and the cost.\n")
 displayTable(result_relation_after_projection, query_result_page)
 removeTable(result_relation_after_projection)
-

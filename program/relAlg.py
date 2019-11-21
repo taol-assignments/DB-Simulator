@@ -130,7 +130,7 @@ def _get_tuples(rel, rid_list):
     rel_path = os.path.join(data_path, rel)
     for row in rid_list:
         offset = int(row[-1:])
-        page_name = row[:-1]
+        page_name = row[:-2]
         content = json.load(open(os.path.join(rel_path, page_name), "r"))
         result.append(content[offset])
     return result
